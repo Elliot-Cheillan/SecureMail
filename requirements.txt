@@ -1,0 +1,10 @@
+aiohttp
+asyncwhois
+beautifulsoup4
+gibberish_detector
+numpy
+pandas
+rapidfuzz
+scikit_learn
+torch
+streamlit

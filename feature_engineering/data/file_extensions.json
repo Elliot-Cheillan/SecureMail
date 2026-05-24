@@ -1,0 +1,611 @@
+{
+  "executable": {
+    ".exe": {
+      "magic": "4D 5A",
+      "size_range": { "min_bytes": 1024, "max_bytes": 524288000 }
+    },
+    ".dll": {
+      "magic": "4D 5A",
+      "size_range": { "min_bytes": 512, "max_bytes": 209715200 }
+    },
+    ".sys": {
+      "magic": "4D 5A",
+      "size_range": { "min_bytes": 512, "max_bytes": 52428800 }
+    },
+    ".scr": {
+      "magic": "4D 5A",
+      "size_range": { "min_bytes": 1024, "max_bytes": 52428800 }
+    },
+    ".cpl": {
+      "magic": "4D 5A",
+      "size_range": { "min_bytes": 1024, "max_bytes": 52428800 }
+    },
+    ".ocx": {
+      "magic": "4D 5A",
+      "size_range": { "min_bytes": 512, "max_bytes": 52428800 }
+    },
+    ".com": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 65280 }
+    },
+    ".bin": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 2147483648 }
+    },
+    ".elf": {
+      "magic": "7F 45 4C 46",
+      "size_range": { "min_bytes": 512, "max_bytes": 524288000 }
+    },
+    ".so": {
+      "magic": "7F 45 4C 46",
+      "size_range": { "min_bytes": 512, "max_bytes": 209715200 }
+    },
+    ".out": {
+      "magic": "7F 45 4C 46",
+      "size_range": { "min_bytes": 512, "max_bytes": 524288000 }
+    },
+    ".run": {
+      "magic": "7F 45 4C 46",
+      "size_range": { "min_bytes": 1024, "max_bytes": 524288000 }
+    },
+    ".dylib": {
+      "magic": ["CE FA ED FE", "CF FA ED FE", "CA FE BA BE"],
+      "size_range": { "min_bytes": 512, "max_bytes": 209715200 }
+    },
+    ".macho": {
+      "magic": [
+        "CE FA ED FE",
+        "CF FA ED FE",
+        "CA FE BA BE",
+        "FE ED FA CE",
+        "FE ED FA CF"
+      ],
+      "size_range": { "min_bytes": 512, "max_bytes": 524288000 }
+    },
+    ".app": {
+      "magic": null,
+      "size_range": { "min_bytes": 4096, "max_bytes": 2147483648 }
+    },
+    ".apk": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 10240, "max_bytes": 2147483648 }
+    },
+    ".ipa": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 102400, "max_bytes": 4294967296 }
+    },
+    ".deb": {
+      "magic": "21 3C 61 72 63 68 3E",
+      "size_range": { "min_bytes": 1024, "max_bytes": 2147483648 }
+    },
+    ".rpm": {
+      "magic": "ED AB EE DB",
+      "size_range": { "min_bytes": 1024, "max_bytes": 2147483648 }
+    },
+    ".msi": {
+      "magic": "D0 CF 11 E0 A1 B1 1A E1",
+      "size_range": { "min_bytes": 10240, "max_bytes": 2147483648 }
+    },
+    ".bat": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 1048576 }
+    },
+    ".cmd": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 1048576 }
+    },
+    ".ps1": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 5242880 }
+    },
+    ".psm1": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 5242880 }
+    },
+    ".psd1": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 1048576 }
+    },
+    ".vbs": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 2097152 }
+    },
+    ".sh": {
+      "magic": "23 21",
+      "size_range": { "min_bytes": 2, "max_bytes": 5242880 }
+    },
+    ".bash": {
+      "magic": "23 21",
+      "size_range": { "min_bytes": 2, "max_bytes": 5242880 }
+    },
+    ".zsh": {
+      "magic": "23 21",
+      "size_range": { "min_bytes": 2, "max_bytes": 5242880 }
+    },
+    ".py": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".pyc": {
+      "magic": ["0D 0A", "33 0D 0D 0A", "42 0D 0D 0A", "55 0D 0D 0A"],
+      "size_range": { "min_bytes": 16, "max_bytes": 52428800 }
+    },
+    ".pyw": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".jar": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 1024, "max_bytes": 524288000 }
+    },
+    ".class": {
+      "magic": "CA FE BA BE",
+      "size_range": { "min_bytes": 100, "max_bytes": 10485760 }
+    },
+    ".cgi": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 5242880 }
+    },
+    ".pl": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 5242880 }
+    },
+    ".rb": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 5242880 }
+    },
+    ".lua": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 5242880 }
+    }
+  },
+
+  "safe": {
+    ".md": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".rst": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".log": {
+      "magic": null,
+      "size_range": { "min_bytes": 0, "max_bytes": 1073741824 }
+    },
+    ".yaml": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".yml": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".toml": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 5242880 }
+    },
+    ".ini": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 1048576 }
+    },
+    ".cfg": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 5242880 }
+    },
+    ".conf": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 5242880 }
+    },
+    ".env": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 524288 }
+    },
+    ".c": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".cpp": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".h": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 5242880 }
+    },
+    ".rs": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".go": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".ts": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".tsx": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".jsx": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".css": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".sass": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".scss": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".sql": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 104857600 }
+    },
+    ".sqlite": {
+      "magic": "53 51 4C 69 74 65 20 66 6F 72 6D 61 74 20 33 00",
+      "size_range": { "min_bytes": 4096, "max_bytes": 10737418240 }
+    },
+    ".db": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10737418240 }
+    },
+    ".pem": {
+      "magic": null,
+      "size_range": { "min_bytes": 100, "max_bytes": 65536 }
+    },
+    ".crt": {
+      "magic": ["30 82", "2D 2D 2D 2D 2D"],
+      "size_range": { "min_bytes": 100, "max_bytes": 65536 }
+    },
+    ".cer": {
+      "magic": "30 82",
+      "size_range": { "min_bytes": 100, "max_bytes": 65536 }
+    },
+    ".pub": {
+      "magic": null,
+      "size_range": { "min_bytes": 32, "max_bytes": 65536 }
+    },
+    ".wasm": {
+      "magic": "00 61 73 6D",
+      "size_range": { "min_bytes": 8, "max_bytes": 104857600 }
+    },
+    ".ttf": {
+      "magic": "00 01 00 00",
+      "size_range": { "min_bytes": 1024, "max_bytes": 52428800 }
+    },
+    ".otf": {
+      "magic": "4F 54 54 4F",
+      "size_range": { "min_bytes": 1024, "max_bytes": 52428800 }
+    },
+    ".woff": {
+      "magic": "77 4F 46 46",
+      "size_range": { "min_bytes": 512, "max_bytes": 10485760 }
+    },
+    ".woff2": {
+      "magic": "77 4F 46 32",
+      "size_range": { "min_bytes": 512, "max_bytes": 10485760 }
+    },
+    ".heic": {
+      "magic": "00 00 00 ?? 66 74 79 70 68 65 69 63",
+      "size_range": { "min_bytes": 10240, "max_bytes": 104857600 }
+    },
+    ".avif": {
+      "magic": "00 00 00 ?? 66 74 79 70 61 76 69 66",
+      "size_range": { "min_bytes": 5120, "max_bytes": 104857600 }
+    },
+    ".epub": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 10240, "max_bytes": 1073741824 }
+    },
+    ".torrent": {
+      "magic": "64 38 3A",
+      "size_range": { "min_bytes": 20, "max_bytes": 10485760 }
+    }
+  },
+
+  "common": {
+    ".pdf": {
+      "magic": "25 50 44 46",
+      "size_range": { "min_bytes": 1024, "max_bytes": 1073741824 }
+    },
+    ".docx": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 2048, "max_bytes": 524288000 }
+    },
+    ".xlsx": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 2048, "max_bytes": 524288000 }
+    },
+    ".pptx": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 10240, "max_bytes": 1073741824 }
+    },
+    ".odt": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 2048, "max_bytes": 524288000 }
+    },
+    ".ods": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 2048, "max_bytes": 524288000 }
+    },
+    ".odp": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 2048, "max_bytes": 524288000 }
+    },
+    ".txt": {
+      "magic": null,
+      "size_range": { "min_bytes": 0, "max_bytes": 104857600 }
+    },
+    ".csv": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 524288000 }
+    },
+    ".json": {
+      "magic": null,
+      "size_range": { "min_bytes": 2, "max_bytes": 104857600 }
+    },
+    ".xml": {
+      "magic": "3C 3F 78 6D 6C",
+      "size_range": { "min_bytes": 5, "max_bytes": 524288000 }
+    },
+    ".html": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 104857600 }
+    },
+    ".htm": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 104857600 }
+    },
+    ".jpg": {
+      "magic": "FF D8 FF",
+      "size_range": { "min_bytes": 1024, "max_bytes": 104857600 }
+    },
+    ".jpeg": {
+      "magic": "FF D8 FF",
+      "size_range": { "min_bytes": 1024, "max_bytes": 104857600 }
+    },
+    ".png": {
+      "magic": "89 50 4E 47 0D 0A 1A 0A",
+      "size_range": { "min_bytes": 67, "max_bytes": 209715200 }
+    },
+    ".gif": {
+      "magic": ["47 49 46 38 37 61", "47 49 46 38 39 61"],
+      "size_range": { "min_bytes": 35, "max_bytes": 104857600 }
+    },
+    ".webp": {
+      "magic": "52 49 46 46 ?? ?? ?? ?? 57 45 42 50",
+      "size_range": { "min_bytes": 30, "max_bytes": 104857600 }
+    },
+    ".bmp": {
+      "magic": "42 4D",
+      "size_range": { "min_bytes": 54, "max_bytes": 209715200 }
+    },
+    ".tiff": {
+      "magic": ["49 49 2A 00", "4D 4D 00 2A"],
+      "size_range": { "min_bytes": 8, "max_bytes": 1073741824 }
+    },
+    ".tif": {
+      "magic": ["49 49 2A 00", "4D 4D 00 2A"],
+      "size_range": { "min_bytes": 8, "max_bytes": 1073741824 }
+    },
+    ".svg": {
+      "magic": null,
+      "size_range": { "min_bytes": 5, "max_bytes": 52428800 }
+    },
+    ".ico": {
+      "magic": "00 00 01 00",
+      "size_range": { "min_bytes": 6, "max_bytes": 10485760 }
+    },
+    ".mp3": {
+      "magic": ["FF FB", "FF F3", "FF F2", "49 44 33"],
+      "size_range": { "min_bytes": 1024, "max_bytes": 524288000 }
+    },
+    ".mp4": {
+      "magic": "00 00 00 ?? 66 74 79 70",
+      "size_range": { "min_bytes": 10240, "max_bytes": 53687091200 }
+    },
+    ".mov": {
+      "magic": "00 00 00 ?? 66 74 79 70",
+      "size_range": { "min_bytes": 10240, "max_bytes": 53687091200 }
+    },
+    ".avi": {
+      "magic": "52 49 46 46 ?? ?? ?? ?? 41 56 49 20",
+      "size_range": { "min_bytes": 10240, "max_bytes": 53687091200 }
+    },
+    ".mkv": {
+      "magic": "1A 45 DF A3",
+      "size_range": { "min_bytes": 10240, "max_bytes": 107374182400 }
+    },
+    ".wav": {
+      "magic": "52 49 46 46 ?? ?? ?? ?? 57 41 56 45",
+      "size_range": { "min_bytes": 44, "max_bytes": 4294967296 }
+    },
+    ".flac": {
+      "magic": "66 4C 61 43",
+      "size_range": { "min_bytes": 4, "max_bytes": 4294967296 }
+    },
+    ".ogg": {
+      "magic": "4F 67 67 53",
+      "size_range": { "min_bytes": 27, "max_bytes": 1073741824 }
+    },
+    ".zip": {
+      "magic": ["50 4B 03 04", "50 4B 05 06", "50 4B 07 08"],
+      "size_range": { "min_bytes": 22, "max_bytes": 107374182400 }
+    },
+    ".tar": {
+      "magic": "75 73 74 61 72",
+      "size_range": { "min_bytes": 512, "max_bytes": 107374182400 }
+    },
+    ".gz": {
+      "magic": "1F 8B",
+      "size_range": { "min_bytes": 20, "max_bytes": 107374182400 }
+    },
+    ".tgz": {
+      "magic": "1F 8B",
+      "size_range": { "min_bytes": 20, "max_bytes": 107374182400 }
+    },
+    ".bz2": {
+      "magic": "42 5A 68",
+      "size_range": { "min_bytes": 14, "max_bytes": 107374182400 }
+    },
+    ".xz": {
+      "magic": "FD 37 7A 58 5A 00",
+      "size_range": { "min_bytes": 32, "max_bytes": 107374182400 }
+    },
+    ".eml": {
+      "magic": null,
+      "size_range": { "min_bytes": 10, "max_bytes": 104857600 }
+    },
+    ".msg": {
+      "magic": "D0 CF 11 E0 A1 B1 1A E1",
+      "size_range": { "min_bytes": 1024, "max_bytes": 104857600 }
+    }
+  },
+
+  "suspicious": {
+    ".vbe": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 2097152 }
+    },
+    ".jse": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 2097152 }
+    },
+    ".wsf": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 2097152 }
+    },
+    ".wsh": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 1048576 }
+    },
+    ".hta": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 10485760 }
+    },
+    ".pif": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 1048576 }
+    },
+    ".lnk": {
+      "magic": "4C 00 00 00",
+      "size_range": { "min_bytes": 76, "max_bytes": 524288 }
+    },
+    ".url": {
+      "magic": null,
+      "size_range": { "min_bytes": 10, "max_bytes": 65536 }
+    },
+    ".reg": {
+      "magic": ["FF FE", "57 69 6E 64 6F 77 73 20 52 65 67 69 73 74 72 79"],
+      "size_range": { "min_bytes": 10, "max_bytes": 52428800 }
+    },
+    ".inf": {
+      "magic": null,
+      "size_range": { "min_bytes": 1, "max_bytes": 1048576 }
+    },
+    ".iso": {
+      "magic": "43 44 30 30 31",
+      "size_range": { "min_bytes": 32768, "max_bytes": 107374182400 }
+    },
+    ".img": {
+      "magic": null,
+      "size_range": { "min_bytes": 512, "max_bytes": 107374182400 }
+    },
+    ".dmg": {
+      "magic": "78 01 73 0D 62 62 60",
+      "size_range": { "min_bytes": 10240, "max_bytes": 21474836480 }
+    },
+    ".vhd": {
+      "magic": "63 6F 6E 65 63 74 69 78",
+      "size_range": { "min_bytes": 512, "max_bytes": 107374182400 }
+    },
+    ".vhdx": {
+      "magic": "76 68 64 78 66 69 6C 65",
+      "size_range": { "min_bytes": 512, "max_bytes": 107374182400 }
+    },
+    ".udf": {
+      "magic": null,
+      "size_range": { "min_bytes": 32768, "max_bytes": 107374182400 }
+    },
+    ".cab": {
+      "magic": "4D 53 43 46",
+      "size_range": { "min_bytes": 20, "max_bytes": 2147483648 }
+    },
+    ".chm": {
+      "magic": "49 54 53 46",
+      "size_range": { "min_bytes": 1024, "max_bytes": 524288000 }
+    },
+    ".diagcab": {
+      "magic": "4D 53 43 46",
+      "size_range": { "min_bytes": 1024, "max_bytes": 104857600 }
+    },
+    ".swf": {
+      "magic": ["43 57 53", "46 57 53", "5A 57 53"],
+      "size_range": { "min_bytes": 8, "max_bytes": 52428800 }
+    },
+    ".doc": {
+      "magic": "D0 CF 11 E0 A1 B1 1A E1",
+      "size_range": { "min_bytes": 1536, "max_bytes": 524288000 }
+    },
+    ".xls": {
+      "magic": "D0 CF 11 E0 A1 B1 1A E1",
+      "size_range": { "min_bytes": 1536, "max_bytes": 524288000 }
+    },
+    ".ppt": {
+      "magic": "D0 CF 11 E0 A1 B1 1A E1",
+      "size_range": { "min_bytes": 1536, "max_bytes": 524288000 }
+    },
+    ".docm": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 2048, "max_bytes": 524288000 }
+    },
+    ".xlsm": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 2048, "max_bytes": 524288000 }
+    },
+    ".pptm": {
+      "magic": "50 4B 03 04",
+      "size_range": { "min_bytes": 10240, "max_bytes": 1073741824 }
+    },
+    ".rtf": {
+      "magic": "7B 5C 72 74 66",
+      "size_range": { "min_bytes": 10, "max_bytes": 524288000 }
+    },
+    ".one": {
+      "magic": "E4 52 5C 7B 8C D8 A7 4D",
+      "size_range": { "min_bytes": 1024, "max_bytes": 524288000 }
+    },
+    ".xsl": {
+      "magic": null,
+      "size_range": { "min_bytes": 5, "max_bytes": 52428800 }
+    },
+    ".library-ms": {
+      "magic": null,
+      "size_range": { "min_bytes": 100, "max_bytes": 1048576 }
+    },
+    ".settingcontent-ms": {
+      "magic": null,
+      "size_range": { "min_bytes": 50, "max_bytes": 1048576 }
+    },
+    ".rar": {
+      "magic": "52 61 72 21 1A 07",
+      "size_range": { "min_bytes": 7, "max_bytes": 107374182400 }
+    },
+    ".7z": {
+      "magic": "37 7A BC AF 27 1C",
+      "size_range": { "min_bytes": 32, "max_bytes": 107374182400 }
+    },
+    ".ace": {
+      "magic": "2A 2A 41 43 45 2A 2A",
+      "size_range": { "min_bytes": 7, "max_bytes": 107374182400 }
+    }
+  }
+}
