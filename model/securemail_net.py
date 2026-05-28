@@ -4,7 +4,7 @@ import torch.nn as nn
 # for each imports.
 
 # I built this model by looking a simple project of pytorch, and re used the program, changes the variables multiples times
-# to get model that return a satisfying accuracy.
+# to get model that return a satisfying accuracy and added some Dropout cause I had some trouble with the training.
 
 
 class SecureMailNet(nn.Module):
@@ -13,8 +13,10 @@ class SecureMailNet(nn.Module):
         self.net = nn.Sequential(
             nn.Linear(n_features, 256),
             nn.ReLU(),
+            nn.Dropout(0.3),
             nn.Linear(256, 128),
             nn.ReLU(),
+            nn.Dropout(0.3),
             nn.Linear(128, 64),
             nn.ReLU(),
             nn.Linear(64, 32),

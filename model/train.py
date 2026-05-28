@@ -5,7 +5,15 @@ import pandas as pd
 import sqlite3
 import pickle
 import os
-from config import DATABASE_FINAL_PATH, MODEL_PATH, SCALER_PATH, SAVED_DIR
+from torch.utils.data import DataLoader, TensorDataset
+from config import (
+    DATABASE_FINAL_PATH,
+    MODEL_PATH,
+    SCALER_PATH,
+    SAVED_DIR,
+    X_TEST_PATH,
+    X_TRAIN_PATH,
+)
 from securemail_net import SecureMailNet
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -33,13 +41,20 @@ def train():
     with open(SCALER_PATH, "wb") as f:
         pickle.dump(scaler, f)
 
+    dataset = TensorDataset(X_train, y_train)
+    loader = DataLoader(dataset, batch_size=256, shuffle=True)
+
     n_features = X_train.shape[1]
     model = SecureMailNet(n_features)
     loss_fn = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(
-        model.parameters(), lr=0.01
+        model.parameters(), lr=0.1
     )  # tested with multiple values of lr, but more it grows, more the model is bad, the balance point is near from this value
-    # (surely there is a better value but with 0.01 it workds well)
+    # (surely there is a better value but with 0.01 it workds well and then during the train if the model is not improving, we reduce the learning rate.)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, factor=0.5)
+
+    best_acc = 0
+    patience_counter = 0
 
     for epoch in range(
         150
@@ -47,12 +62,12 @@ def train():
         # after 150, it stagnates, before 50, he's not train enough
         model.train()
 
-        pred = model(X_train)
-        loss = loss_fn(pred, y_train)
-
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+        for X_batch, y_batch in loader:
+            pred = model(X_batch)
+            loss = loss_fn(pred, y_batch)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
         model.eval()
         with torch.no_grad():
@@ -61,12 +76,26 @@ def train():
             test_preds = (torch.sigmoid(model(X_test)) > 0.5).float()
             test_acc = (test_preds == y_test).float().mean()
 
+        loss_val = loss_fn(model(X_train), y_train)
+        scheduler.step(1 - test_acc)
+
         print(
-            f"Epoch {epoch} | Loss: {loss.item():.4f} | Train: {train_acc:.2%} | Test: {test_acc:.2%}"
+            f"Epoch {epoch} | Loss: {loss_val.item():.4f} | Train: {train_acc:.2%} | Test: {test_acc:.2%}"
         )
 
-    torch.save(model.state_dict(), MODEL_PATH)
-    print(f"\nModel saved — Final test accuracy: {test_acc:.2%}")
+        if test_acc > best_acc:
+            best_acc = test_acc
+            torch.save(model.state_dict(), MODEL_PATH)
+            patience_counter = 0
+        else:
+            patience_counter += 1
+            if patience_counter >= 15:
+                print(f"Early stopping at {epoch} epoch")
+                break
+
+    torch.save(X_train, X_TRAIN_PATH)
+    torch.save(X_test, X_TEST_PATH)
+    print(f"\nModel saved — Final test accuracy: {best_acc:.2%}")
 
     # For info, the model trained on old mails, with a not perfect parsing, the features are impacted, not good variety for mails attacks
     # not enough mails, not recent dataset, so it's trained on nearly 18k old mails and 18k recent mails, the model learn on surely a bad

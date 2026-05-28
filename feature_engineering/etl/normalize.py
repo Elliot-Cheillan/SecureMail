@@ -23,6 +23,8 @@ def create_final_mails_datas(
 
 
 def create_final_links_data(links_features_df):
+    if links_features_df.empty:
+        return pd.DataFrame(columns=["Mail_ID", "Links_Count"])
     features_only = links_features_df.drop(columns=["Mail_ID"])
 
     df_sum = (
@@ -46,6 +48,8 @@ def create_final_links_data(links_features_df):
 
 
 def create_final_attachments_data(attachments_features_df):
+    if attachments_features_df.empty:
+        return pd.DataFrame(columns=["Mail_ID", "Attachments_Count"])
     features_only = attachments_features_df.drop(columns=["Mail_ID"])
 
     df_sum = (

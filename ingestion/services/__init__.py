@@ -1,7 +1,7 @@
 from .email_service import parse_email_file, insert_mail
 from .link_service import parse_links, insert_links
 from .attachment_service import parse_attachments, insert_attachments
-from .enrichment_service import enrich_links
+from .enrichment_service import enrich_links, get_creation_date, get_redirect_url
 
 
 def process_email(cursor, filepath, label, filename):

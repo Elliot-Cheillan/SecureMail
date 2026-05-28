@@ -56,3 +56,4 @@ def run_inference():
     logger.info(f"Spam ratio : {predictions.mean():.2%}")
     logger.info("Check 'scan_results.log' at the root for per-mail details.")
     logger.info("Warning: log file is overwritten on next run, save it if needed !!!")
+    return predictions, probabilities

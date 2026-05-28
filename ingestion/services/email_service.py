@@ -288,9 +288,19 @@ def _parse_content(msg):
     return cleaned
 
 
-def parse_email_file(filepath):  # imported by init
-    with open(filepath, "rb") as f:
-        msg = email.message_from_binary_file(f, policy=policy.default)
+def parse_email_file(filepath=None, file_bytes=None):  # imported by init
+
+    # Here, I added a file_bytes parameter for the web app, cause I didn't expect to create a web app later with this project. So the pipeline
+    # is not adapted to receive a file, but open a file in folder. With this parameter I can change the pipeline without modificate the
+    # code for all the project. Then we can use a different pipeline if you use the project with the website, or the raw code.
+
+    if file_bytes is None:
+        if filepath is None:
+            return None
+        with open(filepath, "rb") as f:
+            msg = email.message_from_binary_file(f, policy=policy.default)
+    else:
+        msg = email.message_from_bytes(file_bytes, policy=policy.default)
 
     date, time = _parse_datetime(msg.get("date", ""))
     if date == "Unknown" or time == "Unknown":
@@ -315,15 +325,15 @@ def parse_email_file(filepath):  # imported by init
         subject = "No subject"
 
     metadata = {
-        "sender_display": sender_display,
-        "sender_email": sender_email,
-        "reply_to_email": reply_to_email,
-        "date": date,
-        "time": time,
-        "subject": subject,
-        "x_mailer": _parse_mailer(msg),
-        "spf_result": _parse_spf_result(msg),
-        "dkim_result": _parse_dkim_result(msg),
+        "sender_display": sanitize_text(sender_display),
+        "sender_email": sanitize_text(sender_email),
+        "reply_to_email": sanitize_text(reply_to_email),
+        "date": sanitize_text(date),
+        "time": sanitize_text(time),
+        "subject": sanitize_text(subject),
+        "x_mailer": sanitize_text(_parse_mailer(msg)),
+        "spf_result": sanitize_text(_parse_spf_result(msg)),
+        "dkim_result": sanitize_text(_parse_dkim_result(msg)),
     }
 
     return msg, metadata, _parse_content(msg)
@@ -339,18 +349,18 @@ def insert_mail(cursor, metadata, content, label, filename):
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """,
         (
-            sanitize_text(metadata["sender_display"]),
-            sanitize_text(metadata["sender_email"]),
-            sanitize_text(metadata["reply_to_email"]),
-            sanitize_text(metadata["date"]),
-            sanitize_text(metadata["time"]),
-            sanitize_text(metadata["subject"]),
-            sanitize_text(metadata["x_mailer"]),
-            sanitize_text(metadata["spf_result"]),
-            sanitize_text(metadata["dkim_result"]),
-            sanitize_text(content),
-            sanitize_text(filename),
-            sanitize_text(label),
+            metadata["sender_display"],
+            metadata["sender_email"],
+            metadata["reply_to_email"],
+            metadata["date"],
+            metadata["time"],
+            metadata["subject"],
+            metadata["x_mailer"],
+            metadata["spf_result"],
+            metadata["dkim_result"],
+            content,
+            filename,
+            label,
         ),
     )
     return cursor.lastrowid

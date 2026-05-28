@@ -34,9 +34,9 @@ def _extract_urls(msg):
 def parse_links(msg, mail_date):  # imported by init
     return [
         {
-            "url": url,
-            "domain": _extract_domain(url),
-            "mail_date": mail_date,
+            "url": sanitize_text(url),
+            "domain": sanitize_text(_extract_domain(url)),
+            "mail_date": sanitize_text(mail_date),
             "domain_creation_date": "Not Computed",
             "redirect_url": "Not Computed",
         }
@@ -53,11 +53,11 @@ def insert_links(
     rows = [
         (
             mail_number,
-            sanitize_text(link["url"]),
-            sanitize_text(link["domain"]),
-            sanitize_text(link["mail_date"]),
-            sanitize_text(link.get("domain_creation_date")),
-            sanitize_text(link.get("redirect_url")),
+            link["url"],
+            link["domain"],
+            link["mail_date"],
+            link.get("domain_creation_date"),
+            link.get("redirect_url"),
         )
         for link in links
     ]

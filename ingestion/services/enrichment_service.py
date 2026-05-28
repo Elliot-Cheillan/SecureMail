@@ -8,7 +8,7 @@ from ingestion.config import HTTP_CONCURRENCY, RDAP_CONCURRENCY, BATCH_SIZE
 logger = logging.getLogger(__name__)
 
 
-async def _get_creation_date(
+async def get_creation_date(
     client, domain, cache, rdap_semaphore
 ):  # the requests limits is on config, don't touch it or the database will have many missing values
     if not domain or domain == "Unknown":
@@ -50,7 +50,7 @@ async def _get_creation_date(
     return creation
 
 
-async def _get_redirect_url(
+async def get_redirect_url(
     session, url, http_semaphore
 ):  # the requests limit is in config, can touch it i didn't try with more but no problem with concurrency at 100
     # and this is the rdap concurrency the real problem
@@ -121,11 +121,11 @@ async def _enrich_all(cursor, conn):
             batch = links[i : i + BATCH_SIZE]
 
             rdap_tasks = [
-                _get_creation_date(client, domain, domain_cache, rdap_semaphore)
+                get_creation_date(client, domain, domain_cache, rdap_semaphore)
                 for _, _, domain in batch
             ]
             redirect_tasks = [
-                _get_redirect_url(session, url, http_semaphore) for _, url, _ in batch
+                get_redirect_url(session, url, http_semaphore) for _, url, _ in batch
             ]
 
             rdap_results, redirect_results = await asyncio.gather(

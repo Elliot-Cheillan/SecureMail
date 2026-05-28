@@ -43,11 +43,11 @@ def parse_attachments(msg):  # imported by init
 
         attachments.append(
             {
-                "filename": filename,
-                "extension": extension,
+                "filename": sanitize_text(filename),
+                "extension": sanitize_text(extension),
                 "file_size": file_size,
-                "file_hash": file_hash,
-                "magic_number": magic_number,
+                "file_hash": sanitize_text(file_hash),
+                "magic_number": sanitize_text(magic_number),
                 "content": content,
             }
         )
@@ -62,11 +62,11 @@ def insert_attachments(cursor, mail_number, attachments):
     rows = [
         (
             mail_number,
-            sanitize_text(att["filename"]),
-            sanitize_text(att["extension"]),
+            att["filename"],
+            att["extension"],
             att.get("file_size"),
-            sanitize_text(att.get("file_hash")),
-            sanitize_text(att.get("magic_number")),
+            att.get("file_hash"),
+            att.get("magic_number"),
         )
         for att in attachments
     ]

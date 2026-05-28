@@ -16,6 +16,7 @@ def load_source_dataframes():
         attachments_df = pd.read_sql_query("SELECT * FROM Attachments", conn)
     return mails_df, links_df, attachments_df
 
+
 def load_new_mails_dataframes():
     with sqlite3.connect(DATABASE_MAILS_PATH) as conn:
         mails_df = pd.read_sql_query("SELECT * FROM Mails", conn)
@@ -23,12 +24,16 @@ def load_new_mails_dataframes():
         attachments_df = pd.read_sql_query("SELECT * FROM Attachments", conn)
 
     # Get only the new mails on the database
-    with sqlite3.connect(DATABASE_FEATURES_PATH) as conn :
-        existing_mail_ids = pd.read_sql_query("SELECT ID FROM Mails_Features", conn)["ID"].tolist()
+    with sqlite3.connect(DATABASE_FEATURES_PATH) as conn:
+        existing_mail_ids = pd.read_sql_query("SELECT ID FROM Mails_Features", conn)[
+            "ID"
+        ].tolist()
 
     new_mails_df = mails_df[~mails_df["ID"].isin(existing_mail_ids)]
     new_links_df = links_df[~links_df["Mail_Number"].isin(existing_mail_ids)]
-    new_attachments_df = attachments_df[~attachments_df["Mail_Number"].isin(existing_mail_ids)]
+    new_attachments_df = attachments_df[
+        ~attachments_df["Mail_Number"].isin(existing_mail_ids)
+    ]
 
     return new_mails_df, new_links_df, new_attachments_df
 
@@ -123,20 +128,32 @@ def build_attachments_features(Attachments_df):
     )
     return df
 
+
 def inject_mails_features(conn, replace_or_append, mails_df):
     mails_features = build_mails_features(mails_df)
-    mails_features.to_sql("Mails_Features", conn, if_exists=replace_or_append, index=False)
+    mails_features.to_sql(
+        "Mails_Features", conn, if_exists=replace_or_append, index=False
+    )
     logger.info(f"✓ Mails_Features injectées — {len(mails_features)} lignes")
+
 
 def inject_links_features(conn, replace_or_append, links_df):
     links_features = build_links_features(links_df)
-    links_features.to_sql("Links_Features", conn, if_exists=replace_or_append, index=False)
+    links_features.to_sql(
+        "Links_Features", conn, if_exists=replace_or_append, index=False
+    )
     logger.info(f"✓ Links_Features injectées — {len(links_features)} lignes")
+
 
 def inject_attachments_features(conn, replace_or_append, attachments_df):
     attachments_features = build_attachments_features(attachments_df)
-    attachments_features.to_sql("Attachments_Features", conn, if_exists=replace_or_append, index=False)
-    logger.info(f"✓ Attachments_Features injectées — {len(attachments_features)} lignes")
+    attachments_features.to_sql(
+        "Attachments_Features", conn, if_exists=replace_or_append, index=False
+    )
+    logger.info(
+        f"✓ Attachments_Features injectées — {len(attachments_features)} lignes"
+    )
+
 
 def inject_all_features(replace_or_append):
 
@@ -145,7 +162,9 @@ def inject_all_features(replace_or_append):
     else:  # append
         mails_df, links_df, attachments_df = load_new_mails_dataframes()
 
-    logger.info(f"Source loaded — {len(mails_df)} mails, {len(links_df)} links, {len(attachments_df)} attachments")
+    logger.info(
+        f"Source loaded — {len(mails_df)} mails, {len(links_df)} links, {len(attachments_df)} attachments"
+    )
 
     if mails_df.empty and links_df.empty and attachments_df.empty:
         logger.info("Rien de nouveau à injecter !")
