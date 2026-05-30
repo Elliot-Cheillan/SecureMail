@@ -3,8 +3,9 @@ import pandas as pd
 import sqlite3
 import pickle
 import logging
-from model.config import DATABASE_FINAL_PATH, MODEL_PATH, SCALER_PATH
+from model.config import DATABASE_FINAL_PATH, MODEL_PATH, SCALER_PATH, X_TRAIN_PATH
 from model.securemail_net import SecureMailNet
+import shap
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ def load_model(model_path=MODEL_PATH, scaler_path=SCALER_PATH):
     return model, scaler
 
 
-def predict(model, scaler, df):
+def _predict(model, scaler, df):
     features_np = df.drop(["Label", "ID"], axis=1).values
     features_scaled = scaler.transform(features_np)
     features_tensor = torch.tensor(features_scaled, dtype=torch.float)
@@ -38,7 +39,7 @@ def run_inference():
     with sqlite3.connect(DATABASE_FINAL_PATH) as conn:
         df = pd.read_sql_query("SELECT * FROM Features_Normalized", conn)
 
-    predictions, probabilities = predict(model, scaler, df)
+    predictions, probabilities = _predict(model, scaler, df)
 
     df["Prediction"] = predictions
     df["Spam_Probability"] = probabilities
@@ -57,3 +58,24 @@ def run_inference():
     logger.info("Check 'scan_results.log' at the root for per-mail details.")
     logger.info("Warning: log file is overwritten on next run, save it if needed !!!")
     return predictions, probabilities
+
+
+def run_explanation(model, scaler, df):
+
+    # Mail_Tensor
+    features_np = df.drop(["Label", "ID"], axis=1).values
+    features_scaled = scaler.transform(features_np)
+    features_tensor = torch.tensor(features_scaled, dtype=torch.float)
+
+    # Train tensor
+    X_train = torch.load(X_TRAIN_PATH)
+
+    # Explainer
+    explainer = shap.DeepExplainer(model, X_train)
+    shap_values = explainer.shap_values(features_tensor)
+
+    values = shap_values[0][0]
+    feature_names = list(df.drop(columns=["ID", "Label"]).columns)
+    shap_dict = dict(zip(feature_names, values))
+
+    return shap_dict

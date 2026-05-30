@@ -1,6 +1,6 @@
 import sys
-import os
 import pandas as pd
+import shap
 
 sys.path.append("..")
 
@@ -20,6 +20,8 @@ from feature_engineering.etl import (
     create_final_links_data,
     create_final_mails_datas,
 )
+
+from model import load_model, _predict, run_explanation
 
 
 def get_raw_infos(file_uploaded_bytes):
@@ -122,3 +124,39 @@ def create_features_jsons(mail_df, links_df, attachments_df):
     final = final.fillna(0)
 
     return final
+
+
+def model_and_explanation(final_df):
+
+    df = pd.DataFrame()
+
+    model, scaler = load_model()
+    predictions, probabilities = _predict(model, scaler, final_df)
+    explanation = run_explanation(model, scaler, final_df)
+
+    df["Prediction"] = predictions
+    df["Spam_Probability"] = probabilities
+    df["Result"] = df["Prediction"].map({1.0: "SPAM", 0.0: "HAM"})
+
+    result = df["Result"][0]
+
+    results = {
+        "predictions": predictions,
+        "probabilities": probabilities,
+        "result": result,
+    }
+
+    return results, explanation
+
+
+def full_pipeline(file_bytes, filename):
+    # The full pipeline is the operations before the explaining part
+    json_mail_infos, content = get_raw_infos(file_bytes)
+    mail_df, links_df, attachments_df = normalize_mail_json(
+        json_mail_infos, content, filename
+    )
+    final_df = create_final_links_data(mail_df, links_df, attachments_df)
+
+    results, explanation = model_and_explanation(final_df)
+
+    return json_mail_infos, final_df, results, explanation
