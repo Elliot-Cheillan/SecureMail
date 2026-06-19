@@ -249,7 +249,9 @@ def _clean_html_content(html):
 def _clean_plain_text(plain):
     if not plain:
         return ""
-    text = re.sub(r'http[s]?://[^\s<>"]+', "[Lien]", plain)
+    lines = [l for l in plain.splitlines() if not l.strip().startswith(">")]
+    text = " ".join(lines)
+    text = re.sub(r'http[s]?://[^\s<>"]+', "[Lien]", text)
     text = re.sub(r"\s+", " ", text)
     text = re.sub(r"\[Lien\]\s*\[Lien\]", "[Lien]", text)
     return text.strip()

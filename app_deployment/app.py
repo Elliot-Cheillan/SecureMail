@@ -120,9 +120,7 @@ if st.session_state.report is None:
         unsafe_allow_html=True,
     )
 
-    file = st.file_uploader(
-        "Upload a .eml file", type=["eml"], label_visibility="hidden"
-    )
+    file = st.file_uploader("\u200b", type=["eml"], label_visibility="collapsed")
 
     if file:
         if st.button("RUN ANALYSIS"):
