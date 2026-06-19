@@ -77,7 +77,7 @@ def run_explanation(model, scaler, df):
     explainer = shap.DeepExplainer(wrapped_model, X_train)
     shap_values = explainer.shap_values(features_tensor)
 
-    values = shap_values[0]
+    values = shap_values[0].tolist()
     feature_names = list(df.drop(columns=["ID", "Label"]).columns)
     shap_dict = dict(zip(feature_names, values))
 
