@@ -120,7 +120,7 @@ if st.session_state.report is None:
         unsafe_allow_html=True,
     )
 
-    file = st.file_uploader("", type=["eml"], label_visibility="collapsed")
+    file = st.file_uploader("Upload", type=["eml"], label_visibility="collapsed")
 
     if file:
         if st.button("RUN ANALYSIS"):
@@ -229,7 +229,7 @@ else:
         for feature, value in indicators.items():
             direction = "→ spam" if value > 0 else "→ legitimate"
             bar_class = "shap-bar-pos" if value > 0 else "shap-bar-neg"
-            bar_width = int(abs(value) / max_shap * 100)
+            bar_width = int(abs(float(value)) / float(max_shap) * 100)
             st.markdown(
                 f"""
             <div class="info-card" style="margin-bottom:8px">
