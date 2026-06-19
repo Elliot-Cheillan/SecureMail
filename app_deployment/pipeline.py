@@ -269,7 +269,6 @@ def full_pipeline(file_bytes, filename):
         json_mail_infos, content, filename
     )
     final_df = final_df = create_features_jsons(mail_df, links_df, attachments_df)
-    print(final_df.to_string())
 
     results, explanation = model_and_explanation(final_df)
 
