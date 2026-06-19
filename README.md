@@ -7,6 +7,10 @@ It takes `.eml` files as input, runs them through a full pipeline
 (parsing → feature extraction → ML model), and outputs a spam
 probability score for each email.
 
+A web application is also available, built with Streamlit, that allows
+anyone to analyze a single email through a browser — without any
+command-line setup.
+
 ## How it works
 
 SecureMail runs in three stages:
@@ -43,33 +47,59 @@ The model reaches **96% accuracy** on its test set.
 
 For each email, SecureMail outputs a spam probability score.
 
+### 4. Explanation (SHAP)
+
+To go beyond a raw score, SecureMail uses SHAP (SHapley Additive
+exPlanations) to surface which features drove the model's decision for
+each individual email.
+
+A `DeepExplainer` is initialized from the saved model weights and a set
+of background tensors stored at training time. For each prediction, it
+computes a SHAP value per feature — positive values push toward spam,
+negative values push toward legitimate. The top contributors are then
+mapped back to human-readable feature names and exposed in the report,
+so you know not just _what_ the model decided, but _why_.
+
 ## Project Structure
 
 ```
 SecureMail/
-├── main.py                  # Entry point
-├── menu.py                  # Main CLI menu
-├── requirements.txt
-├── mailbox/
-│   └── inbox/               # Place your .eml files here
-├── storage/                 # Generated databases (auto-created)
-├── ingestion/               # Stage 1 — Parsing
+├── app_deployment/              # Web application (Streamlit)
+│   ├── app.py                   # UI — layout, styling, result display
+│   ├── pipeline.py              # Adapted pipeline for single-file / JSON-based analysis
+│   └── report.py                # Report builder — structures data for the UI
+├── feature_engineering/         # Stage 2 — Feature extraction
+│   ├── etl/                     # Load, normalize, schema
+│   ├── featuring/               # Threat indicator functions
+│   └── data/                    # Reference lists (spam words, domains...)
+├── ingestion/                   # Stage 1 — Parsing
 │   ├── pipeline/
-│   │   ├── database.py      # Database schema & initialization
-│   │   └── operations.py    # Core parsing logic
+│   │   ├── database.py          # Database schema & initialization
+│   │   └── operations.py        # Core parsing logic
 │   └── services/
-│       ├── email_service.py       # Mail header parsing
+│       ├── email_service.py     # Mail header parsing
 │       ├── enrichment_service.py  # Link enrichment (RDAP, redirects)
-│       ├── link_service.py        # Link extraction
+│       ├── link_service.py      # Link extraction
 │       └── attachment_service.py  # Attachment analysis
-├── feature_engineering/     # Stage 2 — Feature extraction
-│   ├── etl/                 # Load, normalize, schema
-│   ├── featuring/           # Threat indicator functions
-│   └── data/                # Reference lists (spam words, domains...)
-└── model/                   # Stage 3 — Prediction
-    ├── securemail_net.py    # Neural network architecture
-    ├── train.py             # Training script
-    └── predict.py           # Inference on new emails
+├── model/                       # Stage 3 & 4 — Prediction & Explanation
+│   ├── saved/                   # Persisted model artifacts
+│   │   ├── weights.pt           # Trained model weights
+│   │   ├── scaler.pkl           # Fitted StandardScaler
+│   │   └── background.pt        # Background tensors for SHAP
+│   ├── __init__.py
+│   ├── config.py
+│   ├── logger.py
+│   ├── main.py
+│   ├── predict.py               # Inference on new emails
+│   ├── securemail_net.py        # Neural network architecture
+│   ├── shap_wrapper.py          # SHAP DeepExplainer wrapper
+│   └── train.py                 # Training script
+├── storage/                     # Generated databases (auto-created)
+├── .gitignore
+├── main.py                      # Entry point
+├── menu.py                      # Main CLI menu
+├── requirements.txt
+└── test.py
 ```
 
 ## Installation
@@ -87,6 +117,8 @@ pip install -r requirements.txt
 > Warning : `torch` can take a few minutes to install depending on your connection.
 
 ## Usage
+
+### Command-line tool
 
 Place your `.eml` files in `mailbox/inbox/`, then run:
 
@@ -116,6 +148,32 @@ or restart from scratch — everything else is automatic.
 
 **5. Reset Databases** — Clears all data and compacts the databases
 to free up disk space.
+
+### Web application
+
+The web app lets you analyze a single `.eml` file directly in your
+browser — no database, no CLI.
+
+To run it locally:
+
+```bash
+cd app_deployment
+streamlit run app.py
+```
+
+A hosted version is available at **[securemail.streamlit.app](https://securemail.streamlit.app)** — feel free to try it on any `.eml` file you want to check.
+
+Drop a `.eml` file into the interface and the app will:
+
+- Parse the email and extract metadata, links, and attachments
+- Run the model and display a spam / legitimate verdict with a confidence score
+- Show the top SHAP indicators that drove the decision, with direction (→ spam / → legitimate)
+- Highlight spam words detected in the email body
+- Flag suspicious links (HTTP, redirects) and dangerous attachment types
+
+The web pipeline is adapted from the CLI version: it operates on a
+single file, stores intermediate data as JSON instead of SQLite, and
+returns a structured report object consumed by the Streamlit interface.
 
 ## Known Limitations
 
@@ -147,6 +205,8 @@ reasonably well but could be improved with a more rigorous approach.
 - **Pandas** — data manipulation and feature table construction
 - **PyTorch** — neural network architecture and training
 - **Scikit-learn** — data normalization (StandardScaler)
+- **SHAP** — model explainability (DeepExplainer)
+- **Streamlit** — web application interface
 - **aiohttp / asyncwhois** — asynchronous link enrichment (RDAP lookups, redirects)
 - **RapidFuzz** — Jaro-Winkler similarity for identity spoofing detection
 - **gibberish-detector** — nonsense string detection in domains and mailer headers

@@ -4,9 +4,9 @@ import shap
 import asyncio
 import aiohttp
 import asyncwhois
+import os
 
-sys.path.append("..")
-
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ingestion.services import (
     parse_email_file,
     parse_attachments,
