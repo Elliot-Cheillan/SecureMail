@@ -8,3 +8,4 @@ rapidfuzz
 scikit_learn
 torch
 streamlit
+shap

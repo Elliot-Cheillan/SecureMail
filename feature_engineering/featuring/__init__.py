@@ -37,6 +37,8 @@ from .attachment_features import (
     is_magic_number_suspect,
 )
 
+from .constants import spamwords_set
+
 
 __all__ = [
     "is_date_coherent",
@@ -69,4 +71,5 @@ __all__ = [
     "is_file_empty",
     "is_file_size_suspect",
     "is_magic_number_suspect",
+    "spamwords_set",
 ]

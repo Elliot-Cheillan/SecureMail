@@ -23,8 +23,26 @@ def create_final_mails_datas(
 
 
 def create_final_links_data(links_features_df):
+    feature_cols = [
+        "Is_Link_Domain_Age_Unusable",
+        "Is_Link_Domain_Age_Suspect",
+        "Is_Redirect_Link_Unusable",
+        "Is_Redirect_Link_Suspect",
+        "Is_Link_HTTP",
+        "Is_Link_An_IPAdress",
+        "Is_Domain_Name_Suspect",
+        "Is_Site_Extension_Suspect",
+    ]
+    empty_columns = (
+        ["Mail_ID"]
+        + [c + "_Sum" for c in feature_cols]
+        + [c + "_Mean" for c in feature_cols]
+        + ["Links_Count"]
+    )
+
     if links_features_df.empty:
-        return pd.DataFrame(columns=["Mail_ID", "Links_Count"])
+        return pd.DataFrame(columns=empty_columns)
+
     features_only = links_features_df.drop(columns=["Mail_ID"])
 
     df_sum = (
@@ -48,8 +66,25 @@ def create_final_links_data(links_features_df):
 
 
 def create_final_attachments_data(attachments_features_df):
+    feature_cols = [
+        "Is_Attachment_Executable",
+        "Is_Double_Extension",
+        "Is_No_Extension",
+        "Is_Extension_Suspect",
+        "Is_File_Empty",
+        "Is_File_Size_Suspect",
+        "Is_Magic_Number_Suspect",
+    ]
+    empty_columns = (
+        ["Mail_ID"]
+        + [c + "_Sum" for c in feature_cols]
+        + [c + "_Mean" for c in feature_cols]
+        + ["Attachments_Count"]
+    )
+
     if attachments_features_df.empty:
-        return pd.DataFrame(columns=["Mail_ID", "Attachments_Count"])
+        return pd.DataFrame(columns=empty_columns)
+
     features_only = attachments_features_df.drop(columns=["Mail_ID"])
 
     df_sum = (

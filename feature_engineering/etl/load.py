@@ -79,6 +79,20 @@ def build_mails_features(Mails_df):
 
 
 def build_links_features(Links_df):
+    columns = [
+        "Mail_ID",
+        "Is_Link_Domain_Age_Unusable",
+        "Is_Link_Domain_Age_Suspect",
+        "Is_Redirect_Link_Unusable",
+        "Is_Redirect_Link_Suspect",
+        "Is_Link_HTTP",
+        "Is_Link_An_IPAdress",
+        "Is_Domain_Name_Suspect",
+        "Is_Site_Extension_Suspect",
+    ]
+    if Links_df.empty:
+        return pd.DataFrame(columns=columns)
+
     df = pd.DataFrame()
     df["Mail_ID"] = Links_df["Mail_Number"]
     df["Is_Link_Domain_Age_Unusable"] = Links_df["Domain_Creation_Date"].apply(
@@ -107,6 +121,19 @@ def build_links_features(Links_df):
 
 
 def build_attachments_features(Attachments_df):
+    columns = [
+        "Mail_ID",
+        "Is_Attachment_Executable",
+        "Is_Double_Extension",
+        "Is_No_Extension",
+        "Is_Extension_Suspect",
+        "Is_File_Empty",
+        "Is_File_Size_Suspect",
+        "Is_Magic_Number_Suspect",
+    ]
+    if Attachments_df.empty:
+        return pd.DataFrame(columns=columns)
+
     df = pd.DataFrame()
     df["Mail_ID"] = Attachments_df["Mail_Number"]
     df["Is_Attachment_Executable"] = Attachments_df["Extension"].apply(

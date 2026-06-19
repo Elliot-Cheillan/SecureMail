@@ -1,6 +1,9 @@
 import sys
 import pandas as pd
 import shap
+import asyncio
+import aiohttp
+import asyncwhois
 
 sys.path.append("..")
 
@@ -24,18 +27,42 @@ from feature_engineering.etl import (
 from model import load_model, _predict, run_explanation
 
 
+async def _enrich_links_async(link_data):
+    if not link_data:
+        return link_data
+
+    client = asyncwhois.DomainClient()
+    domain_cache = {}
+    rdap_semaphore = asyncio.Semaphore(5)
+    http_semaphore = asyncio.Semaphore(5)
+
+    async with aiohttp.ClientSession(headers={"User-Agent": "Mozilla/5.0"}) as session:
+        rdap_tasks = [
+            get_creation_date(client, link["domain"], domain_cache, rdap_semaphore)
+            for link in link_data
+        ]
+        redirect_tasks = [
+            get_redirect_url(session, link["url"], http_semaphore) for link in link_data
+        ]
+        creation_dates, redirects = await asyncio.gather(
+            asyncio.gather(*rdap_tasks),
+            asyncio.gather(*redirect_tasks),
+        )
+
+    for link, creation, redirect in zip(link_data, creation_dates, redirects):
+        link["domain_creation_date"] = creation
+        link["redirect_url"] = redirect
+
+    return link_data
+
+
 def get_raw_infos(file_uploaded_bytes):
     # Take the bytes of a file so don't forget to take all the file bytes before using this
-
     msg, mail_data, content = parse_email_file(file_bytes=file_uploaded_bytes)
-    link_data = parse_links(msg, mail_data)
+    link_data = parse_links(msg, mail_data["date"])
     attachment_data = parse_attachments(msg)
 
-    for link in link_data:
-        link["domain_creation_date"] = get_creation_date(
-            link["domain"], link["mail_date"]
-        )
-        link["redirect_url"] = get_redirect_url(link["url"])
+    link_data = asyncio.run(_enrich_links_async(link_data))
 
     json_mail_infos = {
         "mail_data": mail_data,
@@ -100,8 +127,26 @@ def normalize_mail_json(mail_json, content, filename):
     # Normalize the name of the attributes in json, so we can use the function in load.py with the good column names
 
     mail_df = pd.DataFrame([mail_datas])
-    links_df = pd.DataFrame(links_datas)
-    attachments_df = pd.DataFrame(attachments_datas)
+    links_columns = [
+        "ID",
+        "Mail_Number",
+        "URL",
+        "Domain",
+        "Mail_Date",
+        "Domain_Creation_Date",
+        "Redirect_URL",
+    ]
+    links_df = pd.DataFrame(links_datas, columns=links_columns)
+    attachments_columns = [
+        "ID",
+        "Mail_Number",
+        "Filename",
+        "Extension",
+        "File_Size_Bytes",
+        "File_Hash",
+        "Magic_Number",
+    ]
+    attachments_df = pd.DataFrame(attachments_datas, columns=attachments_columns)
 
     return mail_df, links_df, attachments_df
 
@@ -140,10 +185,27 @@ def model_and_explanation(final_df):
 
     result = df["Result"][0]
 
+    confidence = round(abs(0.5 - float(probabilities[0])) * 2, 4)
+
+    if confidence < 0.20:
+        confidence_level = "Undecided"
+    elif confidence < 0.40:
+        confidence_level = "Unsure"
+    elif confidence < 0.60:
+        confidence_level = "Moderate"
+    elif confidence < 0.80:
+        confidence_level = "High"
+    elif confidence < 0.90:
+        confidence_level = "Very High"
+    else:
+        confidence_level = "Extremely High"
+
     results = {
         "predictions": predictions,
         "probabilities": probabilities,
         "result": result,
+        "confidence": confidence,
+        "confidence_level": confidence_level,
     }
 
     return results, explanation
@@ -155,8 +217,8 @@ def full_pipeline(file_bytes, filename):
     mail_df, links_df, attachments_df = normalize_mail_json(
         json_mail_infos, content, filename
     )
-    final_df = create_final_links_data(mail_df, links_df, attachments_df)
+    final_df = final_df = create_features_jsons(mail_df, links_df, attachments_df)
 
     results, explanation = model_and_explanation(final_df)
 
-    return json_mail_infos, final_df, results, explanation
+    return json_mail_infos, final_df, results, explanation, content

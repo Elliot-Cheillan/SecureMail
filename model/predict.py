@@ -5,6 +5,7 @@ import pickle
 import logging
 from model.config import DATABASE_FINAL_PATH, MODEL_PATH, SCALER_PATH, X_TRAIN_PATH
 from model.securemail_net import SecureMailNet
+from model.shap_wrapper import ShapWrapper
 import shap
 
 logger = logging.getLogger(__name__)
@@ -70,11 +71,13 @@ def run_explanation(model, scaler, df):
     # Train tensor
     X_train = torch.load(X_TRAIN_PATH)
 
-    # Explainer
-    explainer = shap.DeepExplainer(model, X_train)
+    wrapped_model = ShapWrapper(model)
+    wrapped_model.eval()
+
+    explainer = shap.DeepExplainer(wrapped_model, X_train)
     shap_values = explainer.shap_values(features_tensor)
 
-    values = shap_values[0][0]
+    values = shap_values[0]
     feature_names = list(df.drop(columns=["ID", "Label"]).columns)
     shap_dict = dict(zip(feature_names, values))
 
