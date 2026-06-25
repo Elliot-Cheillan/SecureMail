@@ -1,7 +1,7 @@
 import html
 import streamlit as st
 from pipeline import full_pipeline
-from report import full_report, validate_eml
+from report import full_report
 
 
 def safe(text: str) -> str:
@@ -40,12 +40,13 @@ p, li, span, label { font-family: 'Inter', sans-serif !important; }
 [data-testid="stFileUploader"] section { background: #0D0F14 !important; border: 1px solid #2A2F3E !important; border-radius: 6px !important; }
 [data-testid="stFileUploader"] section:hover { border-color: #E8FF47 !important; }
 [data-testid="stFileDropzoneInstructions"] { color: #4A4F5E !important; font-family: 'Inter', sans-serif !important; font-size: 13px !important; }
+[data-testid="stFileDropzoneInstructions"] > div > span::after { content: " — one file at a time"; color: #4A4F5E; font-size: 11px; }
 [data-testid="stFileUploaderDeleteBtn"] button { background: transparent !important; border: 1px solid #2A2F3E !important; color: #7A8099 !important; padding: 2px 8px !important; width: auto !important; margin-top: 0 !important; font-size: 12px !important; }
 [data-testid="stFileUploaderDeleteBtn"] button:hover { border-color: #FF4F4F !important; color: #FF4F4F !important; background: transparent !important; }
 
 /* FIX 1.45 — cache le bouton natif dupliqué et rend la dropzone entière cliquable */
 [data-testid="stFileUploaderDropzone"] button { display: none !important; }
-[data-testid="stFileUploaderDropzone"] { cursor: pointer !important; }
+[data-testid="stFileUploaderDropzone"] { cursor: pointer !important; transition: border-color 0.3s !important; }
 
 /* Scoped uniquement au bouton RUN ANALYSIS */
 .run-btn [data-testid="stButton"] button { background-color: #E8FF47 !important; color: #0D0F14 !important; font-family: 'Space Mono', monospace !important; font-size: 13px !important; font-weight: 700 !important; border: none !important; border-radius: 6px !important; padding: 12px 32px !important; letter-spacing: 1px !important; width: 100% !important; cursor: pointer !important; margin-top: 8px !important; }
@@ -74,20 +75,36 @@ p, li, span, label { font-family: 'Inter', sans-serif !important; }
 </style>
 
 <script>
-// FIX Streamlit 1.45 — rend la dropzone entière cliquable pour ouvrir le file picker
+// FIX Streamlit 1.45 — rend la dropzone cliquable + bloque le multi-drop
 (function() {
-    function attachClickHandler() {
+    function attachHandlers() {
         const dropzone = window.parent.document.querySelector('[data-testid="stFileUploaderDropzone"]');
         if (dropzone) {
+            // Clic → ouvre le file picker
             dropzone.addEventListener('click', function(e) {
                 const input = dropzone.querySelector('input[type="file"]');
                 if (input) input.click();
             });
+
+            // Bloque le drop de plusieurs fichiers (capture phase, avant Streamlit)
+            dropzone.addEventListener('drop', function(e) {
+                if (e.dataTransfer && e.dataTransfer.files.length > 1) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    // Flash rouge pour signaler le refus
+                    dropzone.style.borderColor = '#FF4F4F';
+                    dropzone.style.borderStyle = 'solid';
+                    setTimeout(function() {
+                        dropzone.style.borderColor = '';
+                        dropzone.style.borderStyle = '';
+                    }, 1000);
+                }
+            }, true);
         } else {
-            setTimeout(attachClickHandler, 300);
+            setTimeout(attachHandlers, 300);
         }
     }
-    attachClickHandler();
+    attachHandlers();
 })();
 </script>
 """,
@@ -143,25 +160,22 @@ if st.session_state.report is None:
     file = st.file_uploader(
         "Upload a .eml file",
         type=["eml"],
+        accept_multiple_files=False,
         label_visibility="hidden",
     )
 
     if file:
-        error = validate_eml(file.getvalue(), file.name)
-        if error:
-            st.error(f"⚠️ {error}")
-        else:
-            st.markdown('<div class="run-btn">', unsafe_allow_html=True)
-            if st.button("RUN ANALYSIS"):
-                with st.spinner("Analysing the email, please wait..."):
-                    json_mail_infos, final_df, results, explanation, content = (
-                        full_pipeline(file_bytes=file.getvalue(), filename=file.name)
-                    )
-                    st.session_state.report = full_report(
-                        explanation, content, results, json_mail_infos
-                    )
-                st.rerun()
-            st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown('<div class="run-btn">', unsafe_allow_html=True)
+        if st.button("RUN ANALYSIS"):
+            with st.spinner("Analysing the email, please wait..."):
+                json_mail_infos, final_df, results, explanation, content = (
+                    full_pipeline(file_bytes=file.getvalue(), filename=file.name)
+                )
+                st.session_state.report = full_report(
+                    explanation, content, results, json_mail_infos
+                )
+            st.rerun()
+        st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown(
         """

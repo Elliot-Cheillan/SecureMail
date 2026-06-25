@@ -9,4 +9,3 @@ scikit_learn
 torch
 streamlit
 shap
-python-magic

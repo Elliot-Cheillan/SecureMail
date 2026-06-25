@@ -1,6 +1,5 @@
 import sys
 import os
-import magic
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from feature_engineering.featuring import spamwords_set
@@ -105,23 +104,6 @@ FEATURE_LABELS_HAM = {
 }
 
 # Report of the the mail received
-
-
-def validate_eml(file_bytes: bytes, filename: str) -> str | None:
-
-    if len(file_bytes) > 10 * 1024 * 1024:
-        return "File is too large (max 10 MB)."
-
-    mime = magic.from_buffer(file_bytes[:2048], mime=True)
-    if not mime.startswith("text/"):
-        return f"Invalid file type detected: {mime}."
-
-    try:
-        raw = file_bytes.decode("utf-8", errors="ignore")
-    except Exception:
-        return "Could not decode the file."
-
-    return None
 
 
 def top_10_indicators(shap_dict, result):
