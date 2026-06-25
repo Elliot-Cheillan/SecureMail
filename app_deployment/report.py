@@ -121,17 +121,6 @@ def validate_eml(file_bytes: bytes, filename: str) -> str | None:
     except Exception:
         return "Could not decode the file."
 
-    valid_headers = (
-        "From:",
-        "Return-Path:",
-        "Received:",
-        "MIME-Version:",
-        "Date:",
-        "Message-ID:",
-    )
-    if not any(raw.startswith(h) for h in valid_headers):
-        return "This file does not look like a valid email (no RFC 822 headers found)."
-
     return None
 
 

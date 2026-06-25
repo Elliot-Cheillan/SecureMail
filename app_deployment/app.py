@@ -42,8 +42,10 @@ p, li, span, label { font-family: 'Inter', sans-serif !important; }
 [data-testid="stFileDropzoneInstructions"] { color: #4A4F5E !important; font-family: 'Inter', sans-serif !important; font-size: 13px !important; }
 [data-testid="stFileUploaderDeleteBtn"] button { background: transparent !important; border: 1px solid #2A2F3E !important; color: #7A8099 !important; padding: 2px 8px !important; width: auto !important; margin-top: 0 !important; font-size: 12px !important; }
 [data-testid="stFileUploaderDeleteBtn"] button:hover { border-color: #FF4F4F !important; color: #FF4F4F !important; background: transparent !important; }
-[data-testid="stFileUploader"] [data-testid="stFileUploaderDropzoneInput"] + div button { background: #1E2330 !important; color: #E8EAF0 !important; font-family: 'Space Mono', monospace !important; font-size: 12px !important; font-weight: 400 !important; border: 1px solid #2A2F3E !important; border-radius: 4px !important; padding: 6px 16px !important; width: auto !important; margin-top: 0 !important; letter-spacing: 0 !important; }
-[data-testid="stFileUploader"] [data-testid="stFileUploaderDropzoneInput"] + div button:hover { border-color: #E8FF47 !important; color: #E8FF47 !important; background: #1E2330 !important; }
+
+/* FIX 1.45 — cache le bouton natif dupliqué et rend la dropzone entière cliquable */
+[data-testid="stFileUploaderDropzone"] button { display: none !important; }
+[data-testid="stFileUploaderDropzone"] { cursor: pointer !important; }
 
 /* Scoped uniquement au bouton RUN ANALYSIS */
 .run-btn [data-testid="stButton"] button { background-color: #E8FF47 !important; color: #0D0F14 !important; font-family: 'Space Mono', monospace !important; font-size: 13px !important; font-weight: 700 !important; border: none !important; border-radius: 6px !important; padding: 12px 32px !important; letter-spacing: 1px !important; width: 100% !important; cursor: pointer !important; margin-top: 8px !important; }
@@ -70,6 +72,24 @@ p, li, span, label { font-family: 'Inter', sans-serif !important; }
 .tag-suspect { background: #2e1a1a; color: #FF4F4F; font-family: 'Space Mono', monospace; font-size: 11px; padding: 2px 8px; border-radius: 4px; border: 1px solid #FF4F4F; }
 .tag-unknown { background: #1e1e24; color: #4A4F5E; font-family: 'Space Mono', monospace; font-size: 11px; padding: 2px 8px; border-radius: 4px; border: 1px solid #4A4F5E; }
 </style>
+
+<script>
+// FIX Streamlit 1.45 — rend la dropzone entière cliquable pour ouvrir le file picker
+(function() {
+    function attachClickHandler() {
+        const dropzone = window.parent.document.querySelector('[data-testid="stFileUploaderDropzone"]');
+        if (dropzone) {
+            dropzone.addEventListener('click', function(e) {
+                const input = dropzone.querySelector('input[type="file"]');
+                if (input) input.click();
+            });
+        } else {
+            setTimeout(attachClickHandler, 300);
+        }
+    }
+    attachClickHandler();
+})();
+</script>
 """,
     unsafe_allow_html=True,
 )
