@@ -8,7 +8,6 @@ def safe(text: str) -> str:
     return html.escape(str(text))
 
 
-# I generated the frontend cause I hate web development and frontend/backend I'm just a data addict
 st.set_page_config(
     page_title="SecureMail",
     page_icon="🛡️",
@@ -35,15 +34,19 @@ p, li, span, label { font-family: 'Inter', sans-serif !important; }
 .step-num { font-family: 'Space Mono', monospace; font-size: 11px; color: #E8FF47; margin-bottom: 8px; }
 .step-title { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #E8EAF0; margin-bottom: 6px; }
 .step-desc { font-family: 'Inter', sans-serif; font-size: 13px; color: #4A4F5E; line-height: 1.5; }
-.terminal-wrap { background: #161920; border: 1px dashed #2A2F3E; border-radius: 8px; padding: 24px 24px 8px 24px; margin-bottom: 8px; }
-.terminal-header { font-family: 'Space Mono', monospace; font-size: 12px; color: #E8FF47; margin-bottom: 16px; }
-.terminal-header span { color: #4A4F5E; font-family: 'Space Mono', monospace; }
-[data-testid="stFileUploader"] { background: transparent !important; }
+[data-testid="stFileUploader"] { background: #161920 !important; border: 1px dashed #2A2F3E !important; border-radius: 8px !important; padding: 20px 24px 20px 24px !important; }
+[data-testid="stFileUploader"]::before { content: ">_ drop your file below"; font-family: 'Space Mono', monospace; font-size: 12px; color: #E8FF47; display: block; margin-bottom: 16px; }
 [data-testid="stFileUploader"] section { background: #0D0F14 !important; border: 1px solid #2A2F3E !important; border-radius: 6px !important; }
 [data-testid="stFileUploader"] section:hover { border-color: #E8FF47 !important; }
 [data-testid="stFileDropzoneInstructions"] { color: #4A4F5E !important; font-family: 'Inter', sans-serif !important; font-size: 13px !important; }
+[data-testid="stFileUploaderDeleteBtn"] button { background: transparent !important; border: 1px solid #2A2F3E !important; color: #7A8099 !important; padding: 2px 8px !important; width: auto !important; margin-top: 0 !important; font-size: 12px !important; }
+[data-testid="stFileUploaderDeleteBtn"] button:hover { border-color: #FF4F4F !important; color: #FF4F4F !important; background: transparent !important; }
+[data-testid="stFileUploader"] [data-testid="stFileUploaderDropzoneInput"] + div button { background: #1E2330 !important; color: #E8EAF0 !important; font-family: 'Space Mono', monospace !important; font-size: 12px !important; font-weight: 400 !important; border: 1px solid #2A2F3E !important; border-radius: 4px !important; padding: 6px 16px !important; width: auto !important; margin-top: 0 !important; letter-spacing: 0 !important; }
+[data-testid="stFileUploader"] [data-testid="stFileUploaderDropzoneInput"] + div button:hover { border-color: #E8FF47 !important; color: #E8FF47 !important; background: #1E2330 !important; }
+
 [data-testid="stButton"] button { background-color: #E8FF47 !important; color: #0D0F14 !important; font-family: 'Space Mono', monospace !important; font-size: 13px !important; font-weight: 700 !important; border: none !important; border-radius: 6px !important; padding: 12px 32px !important; letter-spacing: 1px !important; width: 100% !important; cursor: pointer !important; margin-top: 8px !important; }
 [data-testid="stButton"] button:hover { background-color: #d4e83d !important; }
+
 .disclaimer { background: #0F1117; border-left: 2px solid #2A2F3E; padding: 14px 18px; border-radius: 0 6px 6px 0; margin-top: 32px; margin-bottom: 8px; }
 .disclaimer p { font-family: 'Inter', sans-serif; font-size: 12px; color: #4A4F5E; margin: 0; line-height: 1.6; }
 .disclaimer a { color: #E8FF47 !important; text-decoration: none; }
@@ -92,17 +95,17 @@ if st.session_state.report is None:
         <div class="step-card">
             <div class="step-num">01</div>
             <div class="step-title">Parse</div>
-            <div class="step-desc">Headers, links, attachments and raw content are extracted from your file.</div>
+            <div class="step-desc">Headers, links, attachments, and raw content are extracted from your file.</div>
         </div>
         <div class="step-card">
             <div class="step-num">02</div>
             <div class="step-title">Predict</div>
-            <div class="step-desc">A neural network trained on labelled emails classifies the mail as spam or legitimate.</div>
+            <div class="step-desc">A neural network trained on labelled emails classifies the message as spam or legitimate.</div>
         </div>
         <div class="step-card">
             <div class="step-num">03</div>
             <div class="step-title">Explain</div>
-            <div class="step-desc">SHAP values surface which features pushed the decision, so you know why, not just what.</div>
+            <div class="step-desc">SHAP values surface which features drove the decision, so you understand why — not just what.</div>
         </div>
     </div>
     """,
@@ -111,20 +114,15 @@ if st.session_state.report is None:
 
     st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
-    st.markdown(
-        """
-    <div class="terminal-wrap">
-        <div class="terminal-header">&gt;_ <span>drop your file below</span></div>
-    </div>
-    """,
-        unsafe_allow_html=True,
+    file = st.file_uploader(
+        "Upload a .eml file",
+        type=["eml"],
+        label_visibility="hidden",
     )
-
-    file = st.file_uploader("", type=["eml"], label_visibility="collapsed")
 
     if file:
         if st.button("RUN ANALYSIS"):
-            with st.spinner("Analysing the mail, please wait..."):
+            with st.spinner("Analysing the email, please wait..."):
                 json_mail_infos, final_df, results, explanation, content = (
                     full_pipeline(file_bytes=file.getvalue(), filename=file.name)
                 )
@@ -136,7 +134,7 @@ if st.session_state.report is None:
     st.markdown(
         """
     <div class="disclaimer">
-        <p>This is a student project built for learning purposes. The model is <strong style="color:#E8EAF0">not production-ready</strong> and will make mistakes — do not rely on it for anything that matters. Source code and training details on <a href="https://github.com/Elliot-Cheillan/SecureMail" target="_blank">GitHub ↗</a></p>
+        <p>This is a student project built for learning purposes. The model is <strong style="color:#E8EAF0">not production-ready</strong> and will make mistakes — do not rely on it for anything critical. Source code and training details on <a href="https://github.com/Elliot-Cheillan/SecureMail" target="_blank">GitHub ↗</a></p>
     </div>
     """,
         unsafe_allow_html=True,
@@ -350,6 +348,6 @@ else:
             )
         st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
-    if st.button("← Analyse another mail"):
+    if st.button("← Analyse another email"):
         st.session_state.report = None
         st.rerun()
