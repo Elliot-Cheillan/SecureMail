@@ -15,6 +15,7 @@ def _create_mails_table(cursor):
                         DKIM_Result TEXT,
                         Content TEXT,
                         Filename TEXT,
+                        Raw_EML TEXT,
                         Label TEXT)"""
     )
 
