@@ -1,7 +1,7 @@
 import html
 import streamlit as st
 from pipeline import full_pipeline
-from report import full_report
+from report import full_report, validate_eml
 
 
 def safe(text: str) -> str:
@@ -34,6 +34,7 @@ p, li, span, label { font-family: 'Inter', sans-serif !important; }
 .step-num { font-family: 'Space Mono', monospace; font-size: 11px; color: #E8FF47; margin-bottom: 8px; }
 .step-title { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #E8EAF0; margin-bottom: 6px; }
 .step-desc { font-family: 'Inter', sans-serif; font-size: 13px; color: #4A4F5E; line-height: 1.5; }
+
 [data-testid="stFileUploader"] { background: #161920 !important; border: 1px dashed #2A2F3E !important; border-radius: 8px !important; padding: 20px 24px 20px 24px !important; }
 [data-testid="stFileUploader"]::before { content: ">_ drop your file below"; font-family: 'Space Mono', monospace; font-size: 12px; color: #E8FF47; display: block; margin-bottom: 16px; }
 [data-testid="stFileUploader"] section { background: #0D0F14 !important; border: 1px solid #2A2F3E !important; border-radius: 6px !important; }
@@ -44,8 +45,13 @@ p, li, span, label { font-family: 'Inter', sans-serif !important; }
 [data-testid="stFileUploader"] [data-testid="stFileUploaderDropzoneInput"] + div button { background: #1E2330 !important; color: #E8EAF0 !important; font-family: 'Space Mono', monospace !important; font-size: 12px !important; font-weight: 400 !important; border: 1px solid #2A2F3E !important; border-radius: 4px !important; padding: 6px 16px !important; width: auto !important; margin-top: 0 !important; letter-spacing: 0 !important; }
 [data-testid="stFileUploader"] [data-testid="stFileUploaderDropzoneInput"] + div button:hover { border-color: #E8FF47 !important; color: #E8FF47 !important; background: #1E2330 !important; }
 
-[data-testid="stButton"] button { background-color: #E8FF47 !important; color: #0D0F14 !important; font-family: 'Space Mono', monospace !important; font-size: 13px !important; font-weight: 700 !important; border: none !important; border-radius: 6px !important; padding: 12px 32px !important; letter-spacing: 1px !important; width: 100% !important; cursor: pointer !important; margin-top: 8px !important; }
-[data-testid="stButton"] button:hover { background-color: #d4e83d !important; }
+/* Scoped uniquement au bouton RUN ANALYSIS */
+.run-btn [data-testid="stButton"] button { background-color: #E8FF47 !important; color: #0D0F14 !important; font-family: 'Space Mono', monospace !important; font-size: 13px !important; font-weight: 700 !important; border: none !important; border-radius: 6px !important; padding: 12px 32px !important; letter-spacing: 1px !important; width: 100% !important; cursor: pointer !important; margin-top: 8px !important; }
+.run-btn [data-testid="stButton"] button:hover { background-color: #d4e83d !important; }
+
+/* Bouton "← Analyse another email" */
+.back-btn [data-testid="stButton"] button { background-color: transparent !important; color: #7A8099 !important; font-family: 'Space Mono', monospace !important; font-size: 12px !important; font-weight: 400 !important; border: 1px solid #2A2F3E !important; border-radius: 6px !important; padding: 10px 24px !important; letter-spacing: 0 !important; width: auto !important; margin-top: 8px !important; }
+.back-btn [data-testid="stButton"] button:hover { border-color: #E8FF47 !important; color: #E8FF47 !important; }
 
 .disclaimer { background: #0F1117; border-left: 2px solid #2A2F3E; padding: 14px 18px; border-radius: 0 6px 6px 0; margin-top: 32px; margin-bottom: 8px; }
 .disclaimer p { font-family: 'Inter', sans-serif; font-size: 12px; color: #4A4F5E; margin: 0; line-height: 1.6; }
@@ -121,15 +127,21 @@ if st.session_state.report is None:
     )
 
     if file:
-        if st.button("RUN ANALYSIS"):
-            with st.spinner("Analysing the email, please wait..."):
-                json_mail_infos, final_df, results, explanation, content = (
-                    full_pipeline(file_bytes=file.getvalue(), filename=file.name)
-                )
-                st.session_state.report = full_report(
-                    explanation, content, results, json_mail_infos
-                )
-            st.rerun()
+        error = validate_eml(file.getvalue(), file.name)
+        if error:
+            st.error(f"⚠️ {error}")
+        else:
+            st.markdown('<div class="run-btn">', unsafe_allow_html=True)
+            if st.button("RUN ANALYSIS"):
+                with st.spinner("Analysing the email, please wait..."):
+                    json_mail_infos, final_df, results, explanation, content = (
+                        full_pipeline(file_bytes=file.getvalue(), filename=file.name)
+                    )
+                    st.session_state.report = full_report(
+                        explanation, content, results, json_mail_infos
+                    )
+                st.rerun()
+            st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown(
         """
@@ -348,6 +360,8 @@ else:
             )
         st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
+    st.markdown('<div class="back-btn">', unsafe_allow_html=True)
     if st.button("← Analyse another email"):
         st.session_state.report = None
         st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
