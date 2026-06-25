@@ -260,9 +260,7 @@ def _clean_plain_text(plain):
 def _parse_content(msg):
     body_html = body_plain = None
 
-    for part in msg.walk():
-        if part.is_multipart():
-            continue  # on veut les feuilles, pas les conteneurs
+    for part in msg.iter_parts() if msg.is_multipart() else [msg]:
         ct = part.get_content_type()
         try:
             if ct == "text/plain" and body_plain is None:
@@ -270,7 +268,7 @@ def _parse_content(msg):
             elif ct == "text/html" and body_html is None:
                 body_html = part.get_content()
         except Exception:
-            continue
+            pass
 
     if body_html:
         cleaned = _clean_html_content(body_html)
@@ -281,9 +279,7 @@ def _parse_content(msg):
 
     if not cleaned or cleaned.isspace() or cleaned.strip() == "[Image]":
         has_images = any(
-            p.get_content_type().startswith("image/")
-            for p in msg.walk()
-            if not p.is_multipart()
+            p.get_content_type().startswith("image/") for p in msg.iter_parts()
         )
         return (
             "[No text content - Email contains only images]"
@@ -292,15 +288,6 @@ def _parse_content(msg):
         )
 
     return cleaned
-
-
-def get_raw_headers_and_body_only(msg):
-    # I added it for use features on the code source, to look for hidden scripts, spoofing tries or other methods that only text canno't capture
-    msg_copy = email.message_from_string(msg.as_string(), policy=policy.default)
-    for part in msg_copy.walk():
-        if part.get_content_disposition() == "attachment":
-            part.set_payload("[ATTACHMENT REMOVED]")
-    return msg_copy.as_string()
 
 
 def parse_email_file(filepath=None, file_bytes=None):  # imported by init
@@ -316,8 +303,6 @@ def parse_email_file(filepath=None, file_bytes=None):  # imported by init
             msg = email.message_from_binary_file(f, policy=policy.default)
     else:
         msg = email.message_from_bytes(file_bytes, policy=policy.default)
-
-    raw_eml = get_raw_headers_and_body_only(msg)
 
     date, time = _parse_datetime(msg.get("date", ""))
     if date == "Unknown" or time == "Unknown":
@@ -351,7 +336,6 @@ def parse_email_file(filepath=None, file_bytes=None):  # imported by init
         "x_mailer": sanitize_text(_parse_mailer(msg)),
         "spf_result": sanitize_text(_parse_spf_result(msg)),
         "dkim_result": sanitize_text(_parse_dkim_result(msg)),
-        "raw_eml": raw_eml,
     }
 
     return msg, metadata, _parse_content(msg)
@@ -363,8 +347,8 @@ def insert_mail(cursor, metadata, content, label, filename):
         INSERT INTO Mails (
             Sender_Display_Name, Sender_Email, Reply_To_Email,
             Date, Time, Subject, X_Mailer, SPF_Result, DKIM_Result,
-            Content, Filename, Raw_EML, Label
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            Content, Filename, Label
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """,
         (
             metadata["sender_display"],
@@ -378,7 +362,6 @@ def insert_mail(cursor, metadata, content, label, filename):
             metadata["dkim_result"],
             content,
             filename,
-            metadata["raw_eml"],
             label,
         ),
     )

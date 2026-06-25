@@ -87,7 +87,6 @@ def normalize_mail_json(mail_json, content, filename):
         "DKIM_Result": mail_json["mail_data"]["dkim_result"],
         "Content": content,
         "Filename": filename,
-        "Raw_EML" : mail_json["mail_data"]["raw_eml"],
         "Label": None,
     }
 
