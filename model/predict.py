@@ -76,6 +76,9 @@ def run_explanation(model, scaler, df):
     explainer = shap.DeepExplainer(wrapped_model, X_train)
     shap_values = explainer.shap_values(features_tensor)
 
+    print("TYPE:", type(shap_values))
+    print("SHAPE:", np.array(shap_values).shape)
+
     shap_array = np.array(shap_values)
     if shap_array.ndim == 3 and shap_array.shape[-1] == 1:
         shap_array = shap_array[..., 0]
