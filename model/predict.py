@@ -8,6 +8,7 @@ from model.securemail_net import SecureMailNet
 from model.shap_wrapper import ShapWrapper
 import shap
 import streamlit as st
+import numpy as np
 
 
 logger = logging.getLogger(__name__)
@@ -79,7 +80,7 @@ def run_explanation(model, scaler, df):
     explainer = shap.DeepExplainer(wrapped_model, X_train)
     shap_values = explainer.shap_values(features_tensor)
 
-    values = [v[0] if isinstance(v, list) else v for v in shap_values[0].tolist()]
+    values = shap_values[0].flatten().tolist()
     feature_names = list(df.drop(columns=["ID", "Label"]).columns)
     shap_dict = dict(zip(feature_names, values))
 
