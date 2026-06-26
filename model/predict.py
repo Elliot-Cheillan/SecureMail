@@ -79,14 +79,7 @@ def run_explanation(model, scaler, df):
     explainer = shap.DeepExplainer(wrapped_model, X_train)
     shap_values = explainer.shap_values(features_tensor)
 
-    st.write("TYPE:", type(shap_values))
-    if isinstance(shap_values, list):
-        st.write("LIST LENGTH:", len(shap_values))
-        st.write("SHAPE OF [0]:", shap_values[0].shape)
-    else:
-        st.write("SHAPE:", shap_values.shape)
-
-    values = shap_values[0].tolist()
+    values = [v[0] if isinstance(v, list) else v for v in shap_values[0].tolist()]
     feature_names = list(df.drop(columns=["ID", "Label"]).columns)
     shap_dict = dict(zip(feature_names, values))
 
