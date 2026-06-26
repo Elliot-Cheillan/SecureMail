@@ -7,6 +7,8 @@ from model.config import DATABASE_FINAL_PATH, MODEL_PATH, SCALER_PATH, X_TRAIN_P
 from model.securemail_net import SecureMailNet
 from model.shap_wrapper import ShapWrapper
 import shap
+import numpy as np
+
 
 logger = logging.getLogger(__name__)
 
@@ -62,13 +64,10 @@ def run_inference():
 
 
 def run_explanation(model, scaler, df):
-
-    # Mail_Tensor
     features_np = df.drop(["Label", "ID"], axis=1).values
     features_scaled = scaler.transform(features_np)
     features_tensor = torch.tensor(features_scaled, dtype=torch.float)
 
-    # Train tensor
     X_train = torch.load(X_TRAIN_PATH)
 
     wrapped_model = ShapWrapper(model)
@@ -77,7 +76,11 @@ def run_explanation(model, scaler, df):
     explainer = shap.DeepExplainer(wrapped_model, X_train)
     shap_values = explainer.shap_values(features_tensor)
 
-    values = shap_values[0].tolist()
+    shap_array = np.array(shap_values)
+    if shap_array.ndim == 3 and shap_array.shape[-1] == 1:
+        shap_array = shap_array[..., 0]
+
+    values = shap_array[0].tolist()
     feature_names = list(df.drop(columns=["ID", "Label"]).columns)
     shap_dict = dict(zip(feature_names, values))
 
