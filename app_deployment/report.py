@@ -107,7 +107,7 @@ FEATURE_LABELS_HAM = {
 
 
 def top_10_indicators(shap_dict, result):
-    shap_tuple = list(shap_dict.items())
+    shap_tuple = [(k, v[0] if isinstance(v, list) else v) for k, v in shap_dict.items()]
     labels = FEATURE_LABELS_SPAM if result == "SPAM" else FEATURE_LABELS_HAM
 
     if result == "SPAM":
